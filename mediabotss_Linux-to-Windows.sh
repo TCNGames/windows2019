@@ -10,7 +10,7 @@ else
 #
 # Deleting Previous Windows Installation by the Script
 #umount -l /mnt /media/script /media/sw
-#rm -rf /mediabotss /floppy /virtio /media/* /tmp/*
+#rm -rf /mediabots /floppy /virtio /media/* /tmp/*
 #rm -f /sw.iso /disk.img 
 # installing required Ubuntu packages
 dist=$(hostnamectl | egrep "Operating System" | cut -f2 -d":" | cut -f2 -d " ")
@@ -31,23 +31,23 @@ elif [ $dist = "Ubuntu" -o $dist = "Debian" ] ; then
 fi
 sudo ln -s /usr/bin/genisoimage /usr/bin/mkisofs
 # Downloading resources
-sudo mkdir /mediabotss /floppy /virtio
-link1_status=$(curl -Is https://software-download.microsoft.com/download/pr/17763.737.190906-2324.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us_1.ISO | grep HTTP | cut -f2 -d" " | head -1)
-link2_status=$(curl -Is https://archive.org/download/WS2019S/WS2019.ISO | grep HTTP | cut -f2 -d" ")
-#sudo wget -P /mediabotss https://archive.org/download/WS2019S/WS2019.ISO # Windows Server 2019
+sudo mkdir /mediabots /floppy /virtio
+link1_status=$(curl -Is http://download.microsoft.com/download/6/2/A/62A76ABB-9990-4EFC-A4FE-C7D698DAEB96/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO | grep HTTP | cut -f2 -d" " | head -1)
+link2_status=$(curl -Is https://ia601506.us.archive.org/4/items/WS2012R2/WS2012R2.ISO | grep HTTP | cut -f2 -d" ")
+#sudo wget -P /mediabots https://archive.org/download/WS2012R2/WS2012R2.ISO # Windows Server 2012 R2 
 if [ $link1_status = "200" ] ; then 
-	sudo wget -O /mediabotss/WS2019.ISO https://software-download.microsoft.com/download/pr/17763.737.190906-2324.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us_1.ISO
+	sudo wget -O /mediabots/WS2012R2.ISO http://download.microsoft.com/download/6/2/A/62A76ABB-9990-4EFC-A4FE-C7D698DAEB96/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO 
 elif [ $link2_status = "200" -o $link2_status = "301" -o $link2_status = "302" ] ; then 
-	sudo wget -P /mediabotss https://archive.org/download/WS2019S/WS2019.ISO
+	sudo wget -P /mediabots https://archive.org/download/WS2019S/WS2019.ISO
 else
-	echo -e "${RED}[Error]${NC} ${YELLOW}Sorry! None of Windows OS image urls are available , please report about this issue on Github page : ${NC}https://github.com/mediabotss/Linux-to-Windows-with-QEMU"
+	echo -e "${RED}[Error]${NC} ${YELLOW}Sorry! None of Windows OS image urls are available , please report about this issue on Github page : ${NC}https://github.com/mediabots/Linux-to-Windows-with-QEMU"
 	echo "Exiting.."
 	sleep 30
 	exit 1
 fi
 sudo wget -P /floppy https://ftp.mozilla.org/pub/firefox/releases/64.0/win32/en-US/Firefox%20Setup%2064.0.exe
 sudo mv /floppy/'Firefox Setup 64.0.exe' /floppy/Firefox.exe
-sudo wget -P /floppy https://downloadmirror.intel.com/23073/eng/PROWinx64.exe # Intel Network Adapter for Windows Server 2019 
+sudo wget -P /floppy https://downloadmirror.intel.com/23073/eng/PROWinx64.exe # Intel Network Adapter for Windows Server 2012 R2 
 # Powershell script to auto enable remote desktop for administrator
 sudo touch /floppy/EnableRDP.ps1
 sudo echo -e "Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\' -Name \"fDenyTSConnections\" -Value 0" >> /floppy/EnableRDP.ps1
@@ -92,7 +92,7 @@ else
 fi
 #
 # setting up default values
-custom_param_os="/mediabotss/"$(ls /mediabotss)
+custom_param_os="/mediabots/"$(ls /mediabots)
 custom_param_sw="/sw.iso"
 custom_param_virtio="/virtio/"$(ls /virtio)
 #
@@ -120,7 +120,7 @@ if [ $availableRAM -ge 4650 ] ; then # opened 2nd if
 		sudo dd if=/dev/zero of=$firstDisk bs=1M count=1 # blank out the disk
 		echo "mounting devices"
 		mount -t tmpfs -o size=4500m tmpfs /mnt
-		mv /mediabotss/* /mnt
+		mv /mediabots/* /mnt
 		mkdir /media/sw
 		mount -t tmpfs -o size=121m tmpfs /media/sw
 		mv /sw.iso /media/sw
@@ -189,7 +189,7 @@ if [ $availableRAM -ge 4650 ] ; then
 		sudo dd if=/dev/zero of=$firstDisk bs=1M count=1 # blank out the disk
 		echo "mounting devices"
 		mount -t tmpfs -o size=4500m tmpfs /mnt
-		mv /mediabotss/* /mnt
+		mv /mediabots/* /mnt
 		mkdir /media/sw
 		mount -t tmpfs -o size=121m tmpfs /media/sw
 		mv /sw.iso /media/sw
